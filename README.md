@@ -1,69 +1,134 @@
 # AI-Powered Code Reviewer
 
-## Overview
-
-The AI-Powered Code Reviewer is a tool designed to assist developers in reviewing and improving their code. It leverages the capabilities of Google's Generative AI to provide detailed feedback on code quality, best practices, performance, security, and more.
+An AI-powered code review app with a React frontend and Node.js backend. It sends code to Gemini first, then falls back to Groq if Gemini is rate-limited or unavailable.
 
 ## Features
 
-- **Code Quality**: Ensures clean, maintainable, and well-structured code.
-- **Best Practices**: Suggests industry-standard coding practices.
-- **Efficiency & Performance**: Identifies areas to optimize execution time and resource usage.
-- **Error Detection**: Spots potential bugs, security risks, and logical flaws.
-- **Scalability**: Advises on how to make code adaptable for future growth.
-- **Readability & Maintainability**: Ensures that the code is easy to understand and modify.
+- Code review feedback for quality, readability, performance, and security.
+- Gemini as the primary model.
+- Groq fallback when Gemini fails or hits quota.
+- Frontend toast notifications for API errors and quota issues.
+- Configurable backend URL for local development and deployment.
+
+## Project Structure
+
+- `Backend/` - Express API that talks to Gemini and Groq.
+- `Frontend/` - Vite + React UI for pasting code and viewing the review.
+
+## Prerequisites
+
+- Node.js 20 or later
+- npm
+- A Google Gemini API key
+- A Groq API key for fallback use
 
 ## Setup
 
-### Prerequisites
+### Backend
 
-- Node.js (v20.15.1 or later)
-- npm (Node Package Manager)
-- A Google Generative AI API key
-
-### Installation
-
-1. Clone the repository:
-    ```sh
-    git clone <repository-url>
-    cd AI_Powered Code Reviewer
-    ```
-
-2. Install the dependencies:
-    ```sh
-    cd Backend
-    npm install
-    ```
-
-3. Create a `.env` file in the `Backend` directory and add your Google Generative AI API key:
-    ```plaintext
-    GOOGLE_GEMINI_KEY=your-google-gemini-api-key
-    ```
-
-## Usage
-
-1. Start the backend server:
-    ```sh
-    npm start
-    ```
-
-2. The server will be running on `http://localhost:3000`.
-
-3. Use the API to generate content by sending a POST request to `/generate` with a JSON body containing the `prompt`.
-
-## Example
-
-```sh
-curl -X POST http://localhost:3000/generate -H "Content-Type: application/json" -d '{"prompt": "Review this code..."}'
+1. Install dependencies:
+```bash
+cd Backend
+npm install
 ```
 
-## Screenshot
+2. Create `Backend/.env`:
+```env
+GOOGLE_GEMINI_KEY=your-gemini-key
+GROQ_API_KEY=your-groq-key
+PORT=3000
+```
 
-![Project Screenshot](./screenshot.png)
+3. Start the backend:
+```bash
+npm run dev
+```
 
-## Contributing
+### Frontend
 
-Contributions are welcome! Please open an issue or submit a pull request.
+1. Install dependencies:
+```bash
+cd Frontend
+npm install
+```
+
+2. Create `Frontend/.env` if you need a custom backend URL:
+```env
+VITE_BACKEND_URL=http://localhost:3000
+```
+
+3. Start the frontend:
+```bash
+npm run dev
+```
+
+## API Endpoint
+
+The backend exposes a single review endpoint:
+
+- `POST /ai/get-review`
+
+### Request Body
+
+```json
+{
+    "code": "function sum(a, b) { return a + b; }"
+}
+```
+
+### Success Response
+
+```json
+{
+    "success": true,
+    "review": "..."
+}
+```
+
+### Error Response
+
+```json
+{
+    "success": false,
+    "error": "..."
+}
+```
+
+## Postman Test
+
+Use these settings in Postman:
+
+- Method: `POST`
+- URL: `http://localhost:3000/ai/get-review`
+- Headers: `Content-Type: application/json`
+- Body: raw JSON
+
+Example body:
+
+```json
+{
+    "code": "function fetchData() { return fetch('/api/data').then(r => r.json()); }"
+}
+```
+
+## Environment Variables
+
+Backend:
+
+- `GOOGLE_GEMINI_KEY` - Gemini API key
+- `GROQ_API_KEY` - Groq API key used as fallback
+- `PORT` - backend port
+
+Frontend:
+
+- `VITE_BACKEND_URL` - backend base URL used by the React app
+
+## Notes
+
+- Gemini is tried first.
+- If Gemini returns a quota or rate-limit error, the backend logs the fallback and tries Groq.
+- The frontend shows a toast if the backend returns a quota or AI failure message.
+- Do not place API keys in the frontend `.env`; keep them in `Backend/.env`.
 
 ## License
 
