@@ -21,8 +21,6 @@ jobs:
             git pull origin main
             cd Backend
 
-            if git diff HEAD^ HEAD --name-only | grep package.json; then
-              npm install
-            fi
+            npm install --production
 
-            pm2 reload server
+            pm2 restart server || pm2 start server.js --name server
