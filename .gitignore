@@ -2,3 +2,5 @@
 node_modules/
 Backend/.env
 ai-code-key.pem
+my-new-key.pem
+Frontend/.env
